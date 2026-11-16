@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro-Conecta- Conectando campesinos y consumidores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-leaf me-2"></i>AGRO-CONECTA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-section="home">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="products">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="farmers">Reseñas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="dashboard">Panel de Control</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- Carrito -->
+                    <div class="position-relative me-3">
+                        <button class="btn btn-outline-light position-relative" id="cartToggle">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge" id="cartCount">0</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Notificaciones de pedidos -->
+                    <div class="notification-menu position-relative me-2" id="notificationMenu">
+                        <button class="btn btn-outline-light position-relative" id="notificationToggle" type="button" aria-label="Ver notificaciones">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge d-none" id="notificationCount">0</span>
+                        </button>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                <strong>Notificaciones</strong>
+                                <span class="small text-muted" id="notificationSubtitle">Tus novedades</span>
+                            </div>
+                            <div id="notificationList" class="notification-list">
+                                <p class="text-muted text-center small p-3 mb-0">Inicia sesión para ver tus notificaciones.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usuario -->
+                    <div class="user-menu">
+                        <button class="btn btn-outline-light" id="userToggle">
+                            <i class="fas fa-user me-1"></i> <span id="userName">Invitado</span>
+                        </button>
+                        <div class="dropdown-menu-custom" id="userMenu">
+                            <a class="dropdown-item" href="#" data-action="login">Iniciar Sesión</a>
+                            <a class="dropdown-item" href="#" data-action="register">Registrarse</a>
+                            <div class="dropdown-divider d-none" id="authDivider"></div>
+                            <a class="dropdown-item d-none" href="#" data-action="profile" id="profileLink">Mi Perfil</a>
+                            <a class="dropdown-item d-none" href="#" data-action="logout" id="logoutLink">Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Carrito Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4>Carrito de Compras</h4>
+            <button class="btn btn-sm btn-outline-secondary" id="closeCart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cartItems">
+            <!-- Los productos del carrito se cargarán aquí -->
+            <p class="text-center text-muted">Tu carrito está vacío</p>
+        </div>
+        <div class="mt-4 pt-3 border-top">
+            <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">$0</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <span>Envío:</span>
+                <span id="cartShipping">$5.000</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3 fw-bold">
+                <span>Total:</span>
+                <span id="cartTotal">$5.000</span>
+            </div>
+            <button class="btn btn-success w-100" id="checkoutBtn">Proceder al Pago</button>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Modal de Login/Registro -->
+    <div class="modal-custom" id="authModal">
+        <div class="modal-content-custom">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 id="authModalTitle">Iniciar Sesión</h4>
+                <button class="btn btn-sm btn-outline-secondary" id="closeAuthModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <ul class="nav nav-tabs" id="authTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#loginTab">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#registerTab">Registrarse</a>
+                </li>
+            </ul>
+            
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="loginTab">
+                    <form id="loginForm">
+                        <input type="hidden" name="_csrf" id="loginCsrfToken">
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="loginPassword" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Iniciar Sesión</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="registerTab">
+                    <form id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="registerFirstName" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="registerFirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="registerLastName" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="registerLastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="registerEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="registerPassword" minlength="8" autocomplete="new-password" required>
+                            <div class="form-text">Mínimo 8 caracteres.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerType" class="form-label">Tipo de Usuario</label>
+                            <select class="form-select" id="registerType">
+                                <option value="buyer">Comprador</option>
+                                <option value="farmer">Campesino/Productor</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Registrarse</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Producto -->
+    <div class="modal-custom" id="productModal">
+        <div class="modal-content-custom">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 id="productModalTitle">Agregar Producto</h4>
+                <button class="btn btn-sm btn-outline-secondary" id="closeProductModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="mb-3">
+                    <label for="productName" class="form-label">Nombre del Producto</label>
+                    <input type="text" class="form-control" id="productName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="productDescription" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="productDescription" rows="3" required></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productPrice" class="form-label">Precio ($)</label>
+                        <input type="number" class="form-control" id="productPrice" min="0" step="0.01" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="productCategory" class="form-label">Categoría</label>
+                        <select class="form-select" id="productCategory" required>
+                            <option value="frutas">Frutas</option>
+                            <option value="verduras">Verduras</option>
+                            <option value="granos">Granos</option>
+                            <option value="tuberculos">Tubérculos</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="productImage" class="form-label">Imagen del Producto</label>
+                    <input type="file" class="form-control" id="productImage" accept="image/jpeg,image/png,image/webp,image/gif">
+                    <small class="text-muted">JPG, PNG, WEBP o GIF de hasta 5 MB. Al editar, déjalo vacío para conservar la imagen actual.</small>
+                    <img id="imagePreview" class="image-preview" alt="Vista previa de la imagen">
+                </div>
+                <div class="mb-3">
+                    <label for="productStock" class="form-label">Stock Disponible</label>
+                    <input type="number" class="form-control" id="productStock" min="0" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100" id="productSubmitBtn">Guardar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Checkout -->
+    <div class="modal-custom" id="checkoutModal">
+        <div class="modal-content-custom">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Confirmar Pedido</h4>
+                <button class="btn btn-sm btn-outline-secondary" id="closeCheckoutModal" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="checkoutForm">
+                <div class="mb-3">
+                    <label for="checkoutAddress" class="form-label">Dirección de entrega</label>
+                    <textarea class="form-control" id="checkoutAddress" rows="2" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">¿Cómo deseas pagar?</label>
+                    <select class="visually-hidden" id="checkoutPayment" aria-hidden="true" tabindex="-1">
+                        <option value="contra_entrega">Pago contra entrega</option>
+                        <option value="efectivo">Efectivo (pago presencial)</option>
+                        <option value="nequi">Nequi</option>
+                        <option value="daviplata">Daviplata</option>
+                        <option value="transferencia">Transferencia bancaria</option>
+                        <option value="efecty">Efecty</option>
+                        <option value="pse">PSE</option>
+                        <option value="tarjeta">Tarjeta</option>
+                    </select>
+                    <div class="payment-method-grid" id="paymentMethodGrid">
+                        <button type="button" class="payment-method-card active" data-payment-method="contra_entrega"><i class="fas fa-truck"></i><span>Contra entrega</span><small>Pagas al recibir</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="efectivo"><i class="fas fa-money-bill-wave"></i><span>Efectivo</span><small>Pago presencial</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="nequi"><i class="fas fa-mobile-alt"></i><span>Nequi</span><small>Billetera digital</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="daviplata"><i class="fas fa-wallet"></i><span>Daviplata</span><small>Billetera digital</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="transferencia"><i class="fas fa-university"></i><span>Transferencia</span><small>Desde tu banco</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="efecty"><i class="fas fa-receipt"></i><span>Efecty</span><small>Pago en punto</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="pse"><i class="fas fa-building-columns"></i><span>PSE</span><small>Débito bancario</small></button>
+                        <button type="button" class="payment-method-card" data-payment-method="tarjeta"><i class="far fa-credit-card"></i><span>Tarjeta</span><small>Crédito o débito</small></button>
+                    </div>
+                    <div class="payment-info-panel mt-3" id="paymentInfoPanel" aria-live="polite"></div>
+                </div>
+                <div class="border rounded p-3 mb-3 bg-light" id="checkoutSummary"></div>
+                <button type="submit" class="btn btn-success w-100" id="checkoutSubmitBtn">Confirmar Pedido</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Reseña -->
+    <div class="modal-custom" id="reviewModal">
+        <div class="modal-content-custom">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 id="reviewModalTitle">Dejar reseña</h4>
+                <button class="btn btn-sm btn-outline-secondary" id="closeReviewModal" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="reviewForm">
+                <input type="hidden" id="reviewFarmerId">
+                <div class="mb-3">
+                    <label for="reviewRating" class="form-label">Calificación</label>
+                    <select class="form-select" id="reviewRating" required>
+                        <option value="5">5 - Excelente</option>
+                        <option value="4">4 - Muy bueno</option>
+                        <option value="3">3 - Bueno</option>
+                        <option value="2">2 - Regular</option>
+                        <option value="1">1 - Malo</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="reviewComment" class="form-label">Comentario</label>
+                    <textarea class="form-control" id="reviewComment" rows="3" maxlength="1000" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Enviar reseña</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div id="mainContent">
+        <!-- Home Section -->
+        <section id="homeSection" class="content-section">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="container">
+                    <h1 class="display-4 fw-bold mb-4">Conectando el campo, cultivando futuro</h1>
+                    <p class="lead mb-4">Apoya directamente a los campesinos de El Carmen de Bolívar y disfruta de productos frescos y de calidad.</p>
+                    <div class="d-flex justify-content-center flex-wrap gap-3">
+                        <a href="#" class="btn btn-warning btn-lg" data-section="products">Comprar Productos</a>
+                        <a href="#" class="btn btn-outline-light btn-lg" data-action="register">Vender Productos</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="py-5 bg-light">
+                <div class="container">
+                    <h2 class="section-title">¿Por qué Agro-Conecta?</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card feature-card">
+                                <div class="card-body text-center p-4">
+                                    <i class="fas fa-hand-holding-usd fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Mejores Precios</h5>
+                                    <p class="card-text">Los campesinos reciben precios justos por sus productos al eliminar intermediarios.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card feature-card">
+                                <div class="card-body text-center p-4">
+                                    <i class="fas fa-shipping-fast fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Entrega Directa</h5>
+                                    <p class="card-text">Productos frescos del campo a tu hogar con sistemas de entrega eficientes.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card feature-card">
+                                <div class="card-body text-center p-4">
+                                    <i class="fas fa-seedling fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Productos Frescos</h5>
+                                    <p class="card-text">Disfruta de alimentos cultivados localmente con altos estándares de calidad.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Preview Section -->
+            <section id="products" class="py-5">
+                <div class="container">
+                    <h2 class="section-title">Productos Destacados</h2>
+                    <div class="row g-4" id="featuredProducts">
+                        <!-- Los productos destacados se cargarán aquí -->
+                    </div>
+                    <div class="text-center mt-4">
+                        <a href="#" class="btn btn-success" data-section="products">Ver todos los productos</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Farmers Section -->
+            <section id="farmers" class="py-5 bg-light">
+                <div class="container">
+                    <h2 class="section-title">Nuestros Campesinos</h2>
+                    <div class="row g-4" id="farmersList">
+                        <!-- Los campesinos se cargarán aquí -->
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Products Section -->
+        <section id="productsSection" class="content-section py-5" style="display: none;">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title mb-0">Todos los Productos</h2>
+                    <div>
+                        <select class="form-select" id="categoryFilter">
+                            <option value="all">Todas las categorías</option>
+                            <option value="frutas">Frutas</option>
+                            <option value="verduras">Verduras</option>
+                            <option value="granos">Granos</option>
+                            <option value="tuberculos">Tubérculos</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-4" id="allProducts">
+                    <!-- Todos los productos se cargarán aquí -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboardSection" class="content-section py-5" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">Panel de Control</h2>
+                
+                <div id="guestDashboard" class="text-center py-5">
+                    <div class="demo-credentials mx-auto" style="max-width: 500px;">
+                        <h4>Accede al Panel de Control</h4>
+                        <p class="mb-3">Inicia sesión para gestionar productos y pedidos</p>
+                        <button class="btn btn-success" data-action="login">
+                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="userDashboard" style="display: none;">
+                    <div class="alert alert-info" id="adminAlert" style="display: none;">
+                        <i class="fas fa-crown me-2"></i>
+                        <strong>Modo Administrador:</strong> Puedes editar todos los productos del sistema.
+                    </div>
+                    
+                    <ul class="nav nav-tabs" id="dashboardTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="productsTabLink" data-bs-toggle="tab" href="#productsTab">Gestión de Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="ordersTabLink" data-bs-toggle="tab" href="#ordersTab">Pedidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profileTabLink" data-bs-toggle="tab" href="#profileTab">Mi Perfil</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="productsTab">
+                            <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+                                <h4>Gestión de Productos</h4>
+                                <button class="btn btn-success" id="addProductBtn">
+                                    <i class="fas fa-plus me-1"></i> Agregar Producto
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Campesino</th>
+                                            <th>Categoría</th>
+                                            <th>Precio</th>
+                                            <th>Stock</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="myProductsTable">
+                                        <!-- Los productos del usuario se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="ordersTab">
+                            <div class="mt-3">
+                                <h4 id="ordersTitle">Mis Pedidos</h4>
+                                <div id="ordersList">
+                                    <p class="text-muted">No hay pedidos registrados.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="profileTab">
+                            <div class="mt-3">
+                                <h4>Mi Perfil</h4>
+                                <form id="profileForm" enctype="multipart/form-data">
+                                    <div class="mb-4 d-flex align-items-center gap-3 flex-wrap">
+                                        <img id="profilePhotoPreview" src="" alt="Foto de perfil" class="rounded-circle border" style="width:112px;height:112px;object-fit:cover;">
+                                        <div class="flex-grow-1">
+                                            <label for="profilePhoto" class="form-label">Foto de perfil</label>
+                                            <input type="file" class="form-control" id="profilePhoto" accept="image/jpeg,image/png,image/webp,image/gif">
+                                            <small class="text-muted">JPG, PNG, WEBP o GIF. Tamaño máximo: 5 MB.</small>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="profileFirstName" class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" id="profileFirstName" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="profileLastName" class="form-label">Apellido</label>
+                                            <input type="text" class="form-control" id="profileLastName">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profileEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="profileEmail" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profilePhone" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="profilePhone">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profileAddress" class="form-label">Dirección</label>
+                                        <textarea class="form-control" id="profileAddress" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="profileBio" class="form-label">Sobre mí</label>
+                                        <textarea class="form-control" id="profileBio" rows="3" maxlength="500" placeholder="Cuéntales a los compradores quién eres y qué cultivas"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Actualizar Perfil</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5><i class="fas fa-leaf me-2"></i>Agro-Conecta</h5>
+                    <p>Conectando el campo, cultivando futuro. Apoyando a los campesinos de El Carmen de Bolívar y sus alrededores.</p>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h5>Enlaces</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white text-decoration-none" data-section="home">Inicio</a></li>
+                        <li><a href="#" class="text-white text-decoration-none" data-section="products">Productos</a></li>
+                        <li><a href="#" class="text-white text-decoration-none" data-section="farmers">Reseñas</a></li>
+                        <li><a href="#" class="text-white text-decoration-none" data-section="dashboard">Panel de Control</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <h5>Legal</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white text-decoration-none">Términos y condiciones</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Política de privacidad</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Política de cookies</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-3">
+               <h5>Síguenos</h5>
+<div class="d-flex gap-3">
+    <a href="https://www.facebook.com/TU_PAGINA" class="text-white" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook fa-2x"></i></a>
+    <a href="https://www.instagram.com/TU_CUENTA" class="text-white" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram fa-2x"></i></a>
+    <a href="https://twitter.com/TU_CUENTA" class="text-white" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter fa-2x"></i></a>
+    <a href="https://wa.me/573001234567" class="text-white" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp fa-2x"></i></a>
+</div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p>&copy; 2025 Agro-Conecta. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
