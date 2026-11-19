@@ -1,7 +1,5 @@
 # Agro-Conecta — Fase 2: Security by Design
 
-Esta versión incorpora cambios de seguridad sobre el proyecto existente. No reemplaza la revisión dinámica ni las evidencias que deben capturarse durante la sustentación.
-
 ## Medidas incorporadas
 
 1. **Hash de contraseñas:** bcrypt con factor de trabajo 12.
